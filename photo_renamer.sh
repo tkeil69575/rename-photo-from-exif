@@ -1,8 +1,8 @@
 #!/bin/bash
 
 source_dir="."
-output_dir="/home/tina/test-saved"
-test_run=true
+output_dir="/path/to/output-directory"
+test_run=true #change to false to run script
 failed_rename_file="./failed_rename.txt"
 
 mkdir -p "$output_dir"
