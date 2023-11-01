@@ -2,7 +2,7 @@
 
 ## Description
 
-**Photo Renamer** is a Bash script that renames JPEG files in a specified directory based on their EXIF creation date and time. It also maintains a running number for files created on the same date.
+**Photo Renamer** is a simple Bash script that renames JPEG files in a specified directory and its sub-directories based on their EXIF creation date and time. It also maintains a running number for files created on the same date.
 
 ## Usage
 
