@@ -10,8 +10,9 @@
 
 # Set the source directory, output directory, and the test run flag
 source_dir="."
-output_dir="/path/to/output-dir"
-test_run=true #change to false to run script proper
+output_dir="/home/tina/test-saved"
+copy_dir="/home/tina/test-saved/non-renamable"
+test_run=false #change to false to run script proper
 
 # Create a text file to store the paths and names of files that couldn't be renamed
 failed_rename_file="./failed_rename.txt"
@@ -53,11 +54,73 @@ rename_file() {
     else
         # Print the error message
         echo -e "\e[31m[Error] Could not rename $file. Path and name saved in $failed_rename_file.\e[0m"
-        echo "$file" > "$failed_rename_file"
+        echo "$file" >> "$failed_rename_file"
     fi
 
     # Update the last processed date
     last_date="$compare_creation_date"
+}
+
+copy_deleted() {
+    # Check if copy dir exists, otherwise create it
+    if [ -e "$copy_dir" ]; then
+
+      # Check if the file exists
+      if [ -e "$failed_rename_file" ]; then
+        # Prompt user
+        read -p "Copy non-renameable files to a separate copy folder? (yes/no): " answer
+      
+        if [ "$answer" == "yes" ]; then
+          # Loop through the file and delete each listed file
+          while read -r file; do
+            if [ -e "$file" ]; then
+              if [ "$test_run" = false ]; then
+                cp "$file" "$copy_dir"
+              fi
+              printf "\e[32m[Copied] $file\n\e[0m"
+           else
+              printf "[Error] File not found: $file\n"
+            fi
+          done < "$failed_rename_file"
+          echo "Copying complete."
+        else
+          printf "[Error] No files were copied.\n"
+        fi
+      else
+        printf "[Error] File $file_list not found.\n"
+      fi
+    
+    else
+      mkdir "$copy_dir"
+      copy_deleted
+    fi
+}
+
+failed_delete() {
+    # Check if the file exists
+    if [ -e "$failed_rename_file" ]; then
+      # Prompt user
+      read -p "Delete all non-renameable files from the input folder? (yes/no): " answer
+
+      if [ "$answer" == "yes" ]; then
+        # Loop through the file and delete each listed file
+        while read -r file; do
+          if [ -e "$file" ]; then
+            if [ "$test_run" = false ]; then
+              rm "$file"
+            fi
+            printf "\e[31m[Deleted] $file\n\e[0m"
+          else
+            printf "[Error] File not found: $file\n"
+          fi
+        done < "$failed_rename_file"
+        echo "Deletion complete."
+      else
+        printf "[Error] No files were deleted.\n"
+      fi
+    else
+      printf "[Error] File $file_list not found.\n"
+    fi
 }
 
 # Iterate through JPEG files in the specified directory and its subdirectories
@@ -67,7 +130,7 @@ find "$source_dir" -type f -iname '*.jpg' | sort | while read -r file; do
 
     if [ -z "$creation_date" ]; then
         printf "\e[31m[Error] Could not retrieve creation date for $file. Skipping.\n\e[0m"
-        echo "$file" > "$failed_rename_file"
+        echo "$file" >> "$failed_rename_file"
     else
         # If it's a test run, just show the changes without renaming
         if [ "$test_run" = true ]; then
@@ -83,8 +146,20 @@ find "$source_dir" -type f -iname '*.jpg' | sort | while read -r file; do
 done
 
 # Count the number of lines in the failed_rename_file and assign it to temp_failed_rename_count
-failed_rename_count=$(wc -l < "$failed_rename_file")
+if [ -e "$failed_rename_file" ]; then
+    if [ -s "$failed_rename_file" ]; then
+        failed_rename_count=$(wc -l < "$failed_rename_file")
+    else
+        failed_rename_count=0
+    fi
+else
+    failed_rename_count=0
+fi
 
 # Output the number of files that could not be renamed
-echo "------------------------"
-echo "Number of files that could not be renamed: $failed_rename_count"
+if [ -e "$failed_rename_file" ]; then
+    echo "------------------------"
+    echo "Number of files that could not be renamed: $failed_rename_count"
+    copy_deleted
+    failed_delete
+fi
