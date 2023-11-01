@@ -1,10 +1,11 @@
 #!/bin/bash
 
-# Script Name: photo-renamer.sh
 # Author: Tina Keil
-# Description: This script renames JPEG files in a specified directory based on their exif creation date and time.
-#              It also maintains a running number for files created on the same date.
-# Date: 01.11.2023, V1
+# Description: This script renames JPEG files in a specified directory 
+# based on their exif creation date and time. It also maintains a running 
+# number for files created on the same date and creates a text file with
+# any files it could not rename.
+# Date: 01.11.2023, License: MIT
 
 
 # Set the source directory, output directory, and the test run flag
