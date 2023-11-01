@@ -61,17 +61,18 @@ rename_file() {
     last_date="$compare_creation_date"
 }
 
-copy_deleted() {
+# function to copy non-renameable files to specified directory
+copy_failed() {
     # Check if copy dir exists, otherwise create it
     if [ -e "$copy_dir" ]; then
 
       # Check if the file exists
       if [ -e "$failed_rename_file" ]; then
         # Prompt user
-        read -p "Copy non-renameable files to a separate copy folder? (yes/no): " answer
+        read -p "Copy non-renameable files to a separate copy directory? (yes/no): " answer
       
         if [ "$answer" == "yes" ]; then
-          # Loop through the file and delete each listed file
+          # Loop through the files and copy each listed file
           while read -r file; do
             if [ -e "$file" ]; then
               if [ "$test_run" = false ]; then
@@ -92,10 +93,11 @@ copy_deleted() {
     
     else
       mkdir "$copy_dir"
-      copy_deleted
+      copy_failed
     fi
 }
 
+# function to delete non-renameable files from input directory
 failed_delete() {
     # Check if the file exists
     if [ -e "$failed_rename_file" ]; then
@@ -103,7 +105,7 @@ failed_delete() {
       read -p "Delete all non-renameable files from the input folder? (yes/no): " answer
 
       if [ "$answer" == "yes" ]; then
-        # Loop through the file and delete each listed file
+        # Loop through the files and delete each listed file
         while read -r file; do
           if [ -e "$file" ]; then
             if [ "$test_run" = false ]; then
@@ -160,6 +162,6 @@ fi
 if [ -e "$failed_rename_file" ]; then
     echo "------------------------"
     echo "Number of files that could not be renamed: $failed_rename_count"
-    copy_deleted
+    copy_failed
     failed_delete
 fi
