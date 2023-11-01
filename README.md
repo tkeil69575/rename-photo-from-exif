@@ -12,6 +12,7 @@
 
    - `source_dir`: Set the source directory where your JPEG files are located.
    - `output_dir`: Set the directory where the renamed files will be placed.
+   - `copy_dir`: Set the directory where the non-renameable files will be copied to.
    - `test_run`: Set to `true` to perform a dry run (show changes without renaming), or set to `false` to run the script for real.
 
 3. Run the script using the following command:
